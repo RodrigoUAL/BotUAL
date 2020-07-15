@@ -21,16 +21,7 @@ r = sr.Recognizer()
 
 app = Flask(__name__)
 app.secret_key = 'teste'
-#email=False
-#corpo=False
-#assunto=False
 
-
-#assunto_text=''
-#corpo_text=''
-
-
-#save_id_fb=[]
 
 emailfb={}
 assuntofb={}
@@ -42,14 +33,7 @@ ACCESS_TOKEN = 'EAAiZCzThIjXgBANNU0KBZBu1MbYVZCce9xgqFnwSVaiNA3todrXojgu6hemPC91
 VERIFY_TOKEN = 'verify'
 FB_MESSENGER_URI = "https://graph.facebook.com/v2.6/me/messages?access_token=" + ACCESS_TOKEN
 
-#verify_token = os.getenv('verify', None)
-# token to send messages through facebook messenger
-#access_token = os.getenv('EAAiZCzThIjXgBABjwzmZA33ZA8hkncuce9qR53mYyGdaWh3y3ol3oJ7fcUHaJ5xOS6XyKJMhrNnZCxu5OmdNc2EMn7QO6bi73z4MZC1q1E2K8CWSKpoP0Ctw3XZAMJtluXUMvZBdMRdbg7ALTVnKBlpSp7XPEGPXOzmxhqTN1jdcgZDZD', None)
 
-#VERIFY_TOKEN = 'verify'
-
-# token to send messages through facebook messenger
-#ACCESS_TOKEN='EAAiZCzThIjXgBAKUyoFfZBa9bjEXMt4KUmWKob5JrAbtNdQuqLTZBrlZAOpH0s4QRxArRvkhIhhRcwS5f3hxLXYCmGMPGKkAhE3KA6ZA6uincrFNTI3aA1MMDUPwy2SZBQ2ZCX6ZCsSsmLzwZCWZAE9NizTsdACZCFbDiaIfqoZAJJWZAPQZDZD'
 bot = Bot(ACCESS_TOKEN)
 
 
@@ -217,28 +201,6 @@ def messenger():
                     send_message(recipient_id, respostafb)
                     os.remove("test.mp4")
                     os.remove("test.wav")
-
-
-#        if message.get('postback'):
-#            recipient_id = message['sender']['id']
-#            if message['postback'].get('title'):
-#                response_sent_text = get_message(message['postback'].get('title'))
-#                pre_response_sent_text = get_pre_message(message['postback'].get('title'))
-
-
-#                if pre_response_sent_text != 0 :
-
-
- #                   if check_menu(response_sent_text)==True:
-
- #                       create_buttons(response_sent_text,message['postback'].get('title'),recipient_id, pre_response_sent_text)
-  #                  else:
-   #                     send_message(recipient_id, pre_response_sent_text)
-
-    #            if check_menu(response_sent_text)==False:
-     #               send_message(recipient_id, response_sent_text)
-
-
    return "Message Processed"
 
 
@@ -388,14 +350,6 @@ if __name__ == "__main__":
 def adder_page():
     return render_template("new.html")
 
-
-
-#@app.route("/get_2")
-
-#def get_bot_pre_response(user_response):
-#    user_response = request.args.get('msg')
-#    response=pre_response(user_response)
-#    return response
 
 
 
