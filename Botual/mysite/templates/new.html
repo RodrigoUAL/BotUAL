@@ -3,6 +3,7 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        
         <style>
             * {
                 box-sizing: border-box;
@@ -134,7 +135,7 @@
               right:auto;
           }
 
-        /* Button used to open the chat form - fixed at the bottom of the page */
+        
         .open-button {
           background-color: #006F9E;
           color: white;
@@ -148,7 +149,7 @@
           width: 20.5%;
         }
 
-        /* The popup chat - hidden by default */
+        
         .chat-popup {
           display:none;
           position: relative;
@@ -220,7 +221,9 @@
         function closeForm() {
           document.getElementById("myForm").style.display = "none";
         }
-
+        
+        
+        //funcao que recebe a resposta que foi gerado ao user e faz o seu processamento para aparecer na chatbox
         function getBotResponse() {
             var rawText = $("#text").val();
             var userHtml = '<div class="messages messages--sent"><div class="message">' + rawText + "</div></div>";
@@ -239,7 +242,7 @@
                     data_pre='<div class="messages messages--received"><div class="message">' + fields[1] + '</div></div>';
                     data_post='<div class="messages messages--received"><div class="message">' + fields[fields.length-1] + '</div></div>';
                     if (fields.length==2){
-                        //data_pre=data;
+                        
 
                         botchat.push(data_pre);
 
@@ -250,7 +253,7 @@
                         botchat.push(data_pre);
 
                         for (i = 2; i < fields.length; i++) {
-                          //botchat=botchat+'<div class="messages messages--received"><div class="message">' + fields[i] + '</div></div>'
+                          
                             if (fields[i].includes("(menu)")==true) {
 
                                 var fields_menu= fields[i].split('(menu)');
@@ -282,7 +285,7 @@
 
 
                         }
-                        //botchat.push(data_post);
+                        
 
                         output(botchat);
                     }
@@ -290,7 +293,7 @@
                 document.getElementById("text-bar").scrollIntoView({ block: "start", behavior: "smooth" });
             });
         }
-
+        //envia cada balao com um timeout random
         async function output(baloes){
             for (i = 0; i < baloes.length; i++) {
                 enableMsgLoader();
@@ -305,7 +308,8 @@
             $("#conversation").append(valores);
             $("#conversation").find('#msgloader').appendTo($("#conversation"));
         }
-
+        
+        //ao clicar nos botoes devolve uma resposta ao user e mete o scroll para baixo
         function clickMenu(text) {
             $("#text").val(text.innerText);
             getBotResponse();
@@ -314,6 +318,7 @@
 
         }
 
+        //quando o user clica enter invoca as funcoes de devolver resposta e meter o scroll para baixo
         $("#text").keypress(function(e) {
             if (e.which == 13) {
                 getBotResponse();
@@ -323,33 +328,39 @@
             }
         });
 
+        //mete o scroll para baixo
         function scrollToBottom(){
             $('#conversation').scrollTop($('#conversation')[0].scrollHeight);
         }
-
+    
+        // activa imagem gif do loading antes do balao aparecer
         function enableMsgLoader(){
             document.getElementById("msgloader").style.display="block";
         }
 
-        function disableMsgLoader(){
+        // desactiva imagem gif do loading antes do balao aparecer
+        function disableMsgLoader(){    
             document.getElementById("msgloader").style.display="none";
             setTimeout(scrollToBottom, 200);
         }
 
-            //zona de audio
+            //zona do reconhecimento de voz
             var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             var recognition = new SpeechRecognition();
             recognition.lang = "pt-PT"
+        
+            //load da imagem qnd o botao micro e clicado
             function enableMicro() {
              document.getElementById('micro').src='/static/images/micro_click.png';
              recognition.start();
             }
-
+            //load da imagem qnd o botao micro deixa de ser clicado
             function disableMicro() {
              recognition.stop();
              document.getElementById('micro').src='/static/images/micro.png';
             }
-
+            
+        
             recognition.onresult = function(event) {
               var current = event.resultIndex;
               var transcript = event.results[current][0].transcript;
