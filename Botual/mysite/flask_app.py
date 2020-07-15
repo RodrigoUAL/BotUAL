@@ -1,34 +1,28 @@
-from flask import Flask, session, render_template, request,Response
-
-import requests,urllib3
-import facebook
+from flask import Flask, session, render_template, request
 
 from teste_nltk import bot_app,pre_response,post_response,get_context
 from flask_mail import Mail, Message
 import time
 from pymessenger.bot import Bot
-import copy
 import os
 import sys
-import json
-import time
-from datetime import datetime
-import random
 import speech_recognition as sr
 from urllib.request import urlopen
 import subprocess
-r = sr.Recognizer()
 
+r = sr.Recognizer()
 app = Flask(__name__)
+
 app.secret_key = 'teste'
 
-
+#inicializações das variaveis de sessao para o facebook
 emailfb={}
 assuntofb={}
 assunto_textfb={}
 corpo_textfb={}
 contextfb={}
 
+#access e verify token para o facebook app
 ACCESS_TOKEN = 'EAAiZCzThIjXgBANNU0KBZBu1MbYVZCce9xgqFnwSVaiNA3todrXojgu6hemPC91t5cP50hqRCQxm0rtEUXZCnUI6uL7ptqh6TmHOBQO5zNmwlnGqzjeVyZBl5DC4RbvC7rV2ZCjFIzRx1h8SQYErfaYZCGfhdWe8uqkJwQOmvMQXwZDZD'
 VERIFY_TOKEN = 'verify'
 FB_MESSENGER_URI = "https://graph.facebook.com/v2.6/me/messages?access_token=" + ACCESS_TOKEN
@@ -37,10 +31,10 @@ FB_MESSENGER_URI = "https://graph.facebook.com/v2.6/me/messages?access_token=" +
 bot = Bot(ACCESS_TOKEN)
 
 
-
+#configuração do servidor SMTP
 app.config.update(
 	DEBUG=True,
-	#EMAIL SETTINGS
+	
 	MAIL_SERVER='smtp.gmail.com',
 	MAIL_PORT=465,
 	MAIL_USE_SSL=True,
@@ -52,6 +46,7 @@ mail = Mail(app)
 
 app.extensions['mail'].debug = 0
 
+#função que envia email
 def sendmail(assunto,corpo):
 	with app.app_context():
 		msg = Message(assunto,
@@ -63,12 +58,12 @@ def sendmail(assunto,corpo):
 
 
 
-
+# --FACEBOOK---#
 @app.route("/facebook", methods=['GET'])
+
+#Login na APP
 def verify():
 
-    """Before allowing people to message your bot, Facebook has implemented a verify token
-    that confirms all requests that your bot receives came from Facebook."""
     if request.args.get("hub.challenge"):
         if not request.args.get("hub.verify_token")==VERIFY_TOKEN:
             return "falha na no token",403
@@ -80,7 +75,7 @@ def verify():
 
 
 
-
+#Funcao que permite processar as mensagens do utilizador do facebook
 def messenger():
    data = request.get_json()
    logdata(data)
@@ -109,7 +104,8 @@ def messenger():
 
 
                 context_save=contextfb.get(recipient_id)
-
+		
+		#Gera as respostas ao utilizador
                 response_sent_text = get_message(message['message'].get('text'),recipient_id)
 
                 pre_response_sent_text = get_pre_message(message['message'].get('text'),recipient_id)
@@ -121,22 +117,19 @@ def messenger():
                 contextfb[recipient_id]=new_context
 
 
-                #if pre_response_sent_text != 0 and emailfb==False:
+                
                 if (pre_response_sent_text != 0 and emailfb.get(recipient_id)==False):
 
 
                     if check_menu(response_sent_text)==True:
 
-                        #buttons=create_buttons(response_sent_text,message['message'].get('text'))
-                        #logdata(buttons)
-                        #bot.send_button_message(recipient_id, pre_response_sent_text, buttons)
                         buttons=create_buttons(response_sent_text,message['message'].get('text'))
                         send_quickreply(recipient_id, pre_response_sent_text,buttons)
-                        #send_buttons(response_sent_text,message['message'].get('text'),recipient_id, pre_response_sent_text)
+                        
                     else:
                         send_message(recipient_id, pre_response_sent_text)
 
-                        #send_message(recipient_id, post_response_sent_text)
+                        
 
                 if (post_response_sent_text != 0 and emailfb.get(recipient_id)==False):
 
@@ -144,8 +137,8 @@ def messenger():
                         buttons=create_buttons(post_response_sent_text,message['message'].get('text'))
                         response_sent_text=response_sent_text.split('(bot)')
                         send_quickreply(recipient_id, response_sent_text[1],buttons)
-                    #else:
-                     #   send_message(recipient_id, post_response_sent_text)
+                    
+                    
 
 
 
@@ -169,8 +162,8 @@ def messenger():
                             send_message(recipient_id, response_sent_text[i])
                         emailfb[recipient_id]=False
                         emailfb.pop(recipient_id, None)
-            #if user sends us a GIF, photo,video, or any other non-text item
-            #print(message['message'].get('attachments').get('url'))
+            
+            #Se a mensagem conter algum attachment como por exemplo o audio para que se possa usar a funçao de reconhecimento de voz
             if message['message'].get('attachments'):
                 try:
                     os.remove("test.mp4")
@@ -195,7 +188,7 @@ def messenger():
 
                     with sr.AudioFile('test.wav') as source:
                         audio = r.record(source)
-                    #print(response_sent_nontext)
+                    
                     textfb = r.recognize_google(audio, language = "pt-PT")
                     respostafb=get_message(textfb,recipient_id)
                     send_message(recipient_id, respostafb)
@@ -204,12 +197,7 @@ def messenger():
    return "Message Processed"
 
 
-def logdata(message):
-    print(message)
-    sys.stdout.flush()
-
-
-
+#Devolve a resposta posterior a resposta principal ao utilizador
 def get_post_message(user_response,r_id):
     global contextfb
 
@@ -221,7 +209,7 @@ def get_post_message(user_response,r_id):
     except:
         return response
 
-
+#Devolve a resposta anterior a resposta principal
 def get_pre_message(user_response,r_id):
     global contextfb
     response= pre_response(user_response,contextfb.get(r_id))
@@ -232,12 +220,12 @@ def get_pre_message(user_response,r_id):
     except:
         return response
 
-#chooses a random message to send to the user
+#Devolve a resposta principal ao utilizador
 def get_message(user_response,r_id):
 
     global emailfb,assuntofb,assunto_textfb,corpo_textfb,contextfb
 
-    #if emailfb==False:
+    
     if emailfb.get(r_id)==False:
 
         response=bot_app(user_response,contextfb.get(r_id))
@@ -245,21 +233,13 @@ def get_message(user_response,r_id):
             #emailfb=True
 
             emailfb[r_id]=True
-        #try:
-         #   split_string=response.split("(bot)")
-          #  response=split_string[1]
-        #split_string=response.split("(bot)")
-        #response=split_string[1]
+
 
         return response
-        #except:
-           #return response
 
-    #if emailfb==True and assuntofb==False:
+
+
     if emailfb.get(r_id)==True and assuntofb.get(r_id)==False:
-        #assunto_textfb=user_response
-        #assuntofb=True
-        #emailfb=True
         if user_response=='cancelar':
             post_text=get_post_message('email',r_id)
             return '(bot)operação cancelada(bot)'+post_text
@@ -269,7 +249,7 @@ def get_message(user_response,r_id):
             emailfb[r_id]=True
         return "(bot)Insira o corpo (deixe o seu email ou nº de telefone para ser contactado)(bot)(menu)cancelar"
 
-    #if emailfb==True and assuntofb==True:
+ 
     if emailfb.get(r_id)==True and assuntofb.get(r_id)==True:
 
         if user_response=='cancelar':
@@ -294,20 +274,21 @@ def get_message(user_response,r_id):
         return '(bot)Email enviado com sucesso(bot)'+post_text
 
 
-#uses PyMessenger to send response to user
+#usa a biblioteca PyMessenger para enviar as respostas geradas ao utilizador
 def send_message(recipient_id, response):
     #sends user the text message provided via input response parameter
     bot.send_text_message(recipient_id, response)
     return "success"
 
 
-
+#verifica se a mensagem contem a tag (menu)
 def check_menu(text):
     if '(menu)' in str(text):
         return True
     else:
         return False
 
+#Cria botoes caso haja a tag (menu)
 def create_buttons(text,title):
     b=[]
     count=0
@@ -316,14 +297,10 @@ def create_buttons(text,title):
         count=count+1
         if i!='' and i!='(bot)':
             b.append({"content_type" : "text" , "title" : i , "payload" : title+str(count) })
-        #if len(b)==3:
-         #   if count>4:
-          #      pre='_'
-           # bot.send_button_message(r_id, pre, b)
-            #b=[]
+ 
     return b
 
-
+#Funçao que permite criar botoes no facebook
 def send_quickreply(reply_token, text, answers):
     global FB_MESSENGER_URI
     data = {
@@ -343,9 +320,8 @@ if __name__ == "__main__":
 
 
 
-#HTML
 
-
+#--WEBSITE--
 @app.route("/")
 def adder_page():
     return render_template("new.html")
@@ -355,9 +331,12 @@ def adder_page():
 
 @app.route("/get")
 
-
+#Funçao que restorna as respostas ao utilizador
 def get_bot_response():
-    #global email,assunto,corpo,assunto_text,corpo_text,fb
+    
+
+#Criaçao das variaveis de sessao
+
     if 'context' not in session:
         session['context']="None"
 
@@ -371,7 +350,7 @@ def get_bot_response():
 
 
 
-    #if email==False:
+    
     if session.get('email')==False:
         user_response = request.args.get('msg')
 
@@ -379,15 +358,15 @@ def get_bot_response():
         pre_text=pre_response(user_response,session.get('context'))
         post_text=post_response(user_response,session.get('context'))
         session['context']=get_context(user_response,session.get('context'))
-        #print('resposta',response)
-        #print('user_response',user_response)
+        
+        
         if response=='(bot)está na secção de enviar um mail. insira um assunto(bot)(menu)cancelar':
 
 
             session['email']=True
 
-        #if pre_text==0 or email==True:
-        #print("aqui"+pre_text)
+        
+        
 
         if pre_text==0 and post_text!=0:
             return response+post_text
@@ -401,8 +380,7 @@ def get_bot_response():
 
 
     if session.get('email')==True and session.get('assunto')==False:
-        #assunto_text=request.args.get('msg')
-        #assunto=True
+		
         session['assunto_text']=request.args.get('msg')
         if session['assunto_text']=="cancelar":
             session['assunto']=False
@@ -416,10 +394,6 @@ def get_bot_response():
     if session.get('email')==True and session.get('assunto')==True:
 
         session['corpo_text']=request.args.get('msg')
-
-
-
-
         session['email']=False
         session['assunto']=False
 
