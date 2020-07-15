@@ -1,19 +1,13 @@
 # BotUAL
 Chatbot para a Universidade Autónoma de Lisboa
 
-## **INTRODUCTION**
+## **INTRODUÇÃO**
 
 
         
 
-## **CONTENTS**
 
-
-
-
-
-
-## **FILES**
+## **FICHEIROS**
 
 
   
@@ -21,16 +15,16 @@ Chatbot para a Universidade Autónoma de Lisboa
 
         
 
-## **HOW TO USE**
+## **COMO USAR**
 
 
 
 
 
-## **ENVIRONMENT**
+## **BIBLIOTECAS USADAS**
 
 
         
 
-## **AUTHORS**
+## **AUTORES**
 
