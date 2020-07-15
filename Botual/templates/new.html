@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            .clearfix:after, .messages:after {
+                content: "";
+                display: table;
+                clear: both;
+                height: 0;
+                visibility: hidden;
+            }
+
+            body {
+                background-color: #ddd;
+
+                font-family: monospace;
+            }
+
+            #screen {
+                background-color: #fff;
+                position: fixed;
+                height: 49.5%;
+                width: 20.5%;
+                margin: 0 auto;
+                margin-left: 76%;
+                top: 44.5%;
+                box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+            }
+
+            #conversation {
+                height: calc(100% - 10%);
+                overflow: auto;
+                padding: 5%;
+                padding-bottom: 0;
+            }
+
+            .messages {
+                margin-bottom: 10px;
+            }
+
+            .messages--received .message {
+                float: left;
+                background-color: #ddd;
+                border-bottom-left-radius: 5px;
+                border-top-left-radius: 5px;
+            }
+
+            .messages--received .message:first-child {
+                border-top-left-radius: 15px;
+            }
+
+            .messages--received .message:last-child {
+                border-bottom-left-radius: 15px;
+            }
+
+            .messages--sent .message {
+                float: right;
+                background-color: #1998e6;
+                color: #fff;
+                border-bottom-right-radius: 5px;
+                border-top-right-radius: 5px;
+            }
+
+            .messages--sent .message:first-child {
+                border-top-right-radius: 15px;
+            }
+
+            .messages--sent .message:last-child {
+                border-bottom-right-radius: 15px;
+            }
+
+            .message {
+                display: inline-block;
+                margin-bottom: 0.5%;
+                clear: both;
+                padding: 7px 13px;
+                font-size: 110%;
+                border-radius: 15px;
+                line-height: 1.4;
+            }
+
+            #text-bar {
+                padding-left: 0.1%;
+                height: 5.3%;
+                position: fixed;
+                width: 21%;
+
+            }
+
+            #text {
+                width: 85%;
+                height: 100%;
+                padding: 0 5%;
+                border: none;
+                position: relative;
+                vertical-align: middle;
+                font-size: 14px;
+                bottom: 20%;
+            }
+
+    .menu{
+           background-color: #ddd;
+            border-radius: 15px;
+            clear: both;
+            padding: 7px 13px;
+            text-align: center;
+            margin-bottom: 2px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 95%;
+            line-height: 1.4;
+            transition-duration: 0.4s;
+            cursor: pointer;
+            border-width: 0px;
+            font-family: monospace;
+          }
+
+          .menu:hover {
+          background-color: #1998e6;
+          color: white;
+          }
+
+          input#micro{
+              width: 1.5%;
+              height: 3.5%;
+              top: 89%;
+              position: fixed;
+              right:auto;
+          }
+
+        /* Button used to open the chat form - fixed at the bottom of the page */
+        .open-button {
+          background-color: #006F9E;
+          color: white;
+          padding: 1%;
+          border: none;
+          cursor: pointer;
+          opacity: 0.8;
+          position:fixed;
+          margin-left: 76%;
+          bottom: 1%;
+          width: 20.5%;
+        }
+
+        /* The popup chat - hidden by default */
+        .chat-popup {
+          display:none;
+          position: relative;
+        }
+
+          .btn-cancel {
+          background-color: #006F9E;
+          color: white;
+          padding: 1%;
+          border: none;
+          cursor: pointer;
+          opacity: 0.8;
+          position:fixed;
+          margin-left: 76%;
+          bottom: 1%;
+          width: 20.5%;
+
+        }
+
+        #msgloader{
+            display:none;
+            position:relative;
+            bottom:2%;
+
+
+        }
+
+        .header {
+          padding: 60px;
+          text-align: center;
+          background: #006F9E;
+          color: white;
+          font-size: 30px;
+        }
+
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>UAL</h1>
+            <p>Universidade Autónoma de Lisboa</p>
+        </div>
+        <button class="open-button" onclick="openForm()">Bot UAL</button>
+        <div class="chat-popup" id="myForm">
+            <button type="button" class="btn-cancel" onclick="closeForm()">Bot UAL</button>
+            <div id="screen">
+            	<div id="conversation">
+            		<div class="messages messages--received">
+            			<div class="message">Olá! Sou o Bot UAL, em que posso ser útil?</div>
+                        <div id="msgloader"><img src="/static/images/msgload.gif" width="40%" height="40%"></div>
+            		</div>
+
+            	</div>
+
+            	<div id="text-bar">
+            		<input id="text" type="text" name="msg" placeholder="Mensagem" />
+            		<input type="image" src="/static/images/micro.png" id="micro" onmouseup="disableMicro()" onmousedown="enableMicro()">
+            	</div>
+            </div>
+        </div>
+    </body>
+    <script>
+        setTimeout(function() {$('.open-button').trigger('click');}, 5000);
+
+        function openForm() {
+          document.getElementById("myForm").style.display = "block";
+        }
+
+        function closeForm() {
+          document.getElementById("myForm").style.display = "none";
+        }
+
+        function getBotResponse() {
+            var rawText = $("#text").val();
+            var userHtml = '<div class="messages messages--sent"><div class="message">' + rawText + "</div></div>";
+            $("#text").val("");
+            chatboxSave(userHtml);
+            document.getElementById("text-bar").scrollIntoView({ block: "start", behavior: "smooth" });
+            $.get("/get", { msg: rawText }).done(function(data){
+                var menu='';
+                var data_pre='';
+                var botHtml='';
+                var aux='';
+                var botchat=[];
+
+                if (data.includes("(bot)")) {
+                    var fields= data.split('(bot)');
+                    data_pre='<div class="messages messages--received"><div class="message">' + fields[1] + '</div></div>';
+                    data_post='<div class="messages messages--received"><div class="message">' + fields[fields.length-1] + '</div></div>';
+                    if (fields.length==2){
+                        //data_pre=data;
+
+                        botchat.push(data_pre);
+
+                        output(botchat);
+                    }
+                    else if (data_post!=data_pre){
+
+                        botchat.push(data_pre);
+
+                        for (i = 2; i < fields.length; i++) {
+                          //botchat=botchat+'<div class="messages messages--received"><div class="message">' + fields[i] + '</div></div>'
+                            if (fields[i].includes("(menu)")==true) {
+
+                                var fields_menu= fields[i].split('(menu)');
+
+
+                                for (j = 1; j < fields_menu.length; j++) {
+                                    menu = menu + '<div class="messages messages--received"><button onclick="clickMenu(this)" class="menu" data-string=' + fields_menu[j] + '>' + fields_menu[j] + '</button></div>';
+                                }
+                                botchat.push(menu);
+                            }
+
+                            else if (fields[i].includes("http")==true) {
+
+                                var fields_html=fields[i].split('https://');
+                                var link=fields_html[1];
+
+                                botHtml = '<div class="messages messages--received"><div class="message"><a target="_blank" rel="noopener noreferrer" href="https://'+ link +'">'+ link +'</a></div></div>';
+
+                                botchat.push(botHtml);
+                            }
+
+                            else{
+                                botHtml='<div class="messages messages--received"><div class="message">' + fields[i] + '</div></div>';
+
+                                botchat.push(botHtml)
+                            }
+
+
+
+
+                        }
+                        //botchat.push(data_post);
+
+                        output(botchat);
+                    }
+                }
+                document.getElementById("text-bar").scrollIntoView({ block: "start", behavior: "smooth" });
+            });
+        }
+
+        async function output(baloes){
+            for (i = 0; i < baloes.length; i++) {
+                enableMsgLoader();
+                random_number=Math.floor((Math.random() * 3000) + 1000);
+                await new Promise(done => setTimeout(() => done(), random_number));
+                chatboxSave(baloes[i]);
+            }
+        }
+
+        function chatboxSave(valores){
+            disableMsgLoader();
+            $("#conversation").append(valores);
+            $("#conversation").find('#msgloader').appendTo($("#conversation"));
+        }
+
+        function clickMenu(text) {
+            $("#text").val(text.innerText);
+            getBotResponse();
+            scrollToBottom();
+            setTimeout(scrollToBottom, 200);
+
+        }
+
+        $("#text").keypress(function(e) {
+            if (e.which == 13) {
+                getBotResponse();
+                enableMsgLoader();
+                scrollToBottom();
+                setTimeout(scrollToBottom, 200);
+            }
+        });
+
+        function scrollToBottom(){
+            $('#conversation').scrollTop($('#conversation')[0].scrollHeight);
+        }
+
+        function enableMsgLoader(){
+            document.getElementById("msgloader").style.display="block";
+        }
+
+        function disableMsgLoader(){
+            document.getElementById("msgloader").style.display="none";
+            setTimeout(scrollToBottom, 200);
+        }
+
+            //zona de audio
+            var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            var recognition = new SpeechRecognition();
+            recognition.lang = "pt-PT"
+            function enableMicro() {
+             document.getElementById('micro').src='/static/images/micro_click.png';
+             recognition.start();
+            }
+
+            function disableMicro() {
+             recognition.stop();
+             document.getElementById('micro').src='/static/images/micro.png';
+            }
+
+            recognition.onresult = function(event) {
+              var current = event.resultIndex;
+              var transcript = event.results[current][0].transcript;
+              $("#text").val(transcript);
+            }
+
+    </script>
+</html>
