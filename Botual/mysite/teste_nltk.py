@@ -13,9 +13,10 @@ class_context = {}
 corpus_words = {}
 
 
+#Algoritmo de Naive Bayes
 
+#Training data
 training_data.append({"class":"hello", "context":"None","sentence":"sim"})
-
 training_data.append({"class":"candidatura","context":"None", "sentence":"Quais são as candidaturas ?"})
 training_data.append({"class":"candidatura","context":"None", "sentence":"Possíveis candidaturas ?"})
 training_data.append({"class":"candidatura","context":"None", "sentence":"Quero saber as candidaturas"})
@@ -30,7 +31,6 @@ training_data.append({"class":"hello","context":"None", "sentence":"hello"})
 training_data.append({"class":"hello","context":"None", "sentence":"hola"})
 training_data.append({"class":"hello","context":"None", "sentence":"hey"})
 training_data.append({"class":"hello","context":"None", "sentence":"oi"})
-
 training_data.append({"class":"cumprimentos_2", "context":"RHello" ,"sentence":"tambem esta tudo bem"})
 training_data.append({"class":"cumprimentos_2", "context":"RHello","sentence":"sim"})
 training_data.append({"class":"cumprimentos_2", "context":"RHello","sentence":"tambem"})
@@ -41,8 +41,6 @@ training_data.append({"class":"cumprimentos_2", "context":"RHello","sentence":"e
 training_data.append({"class":"cumprimentos_2", "context":"RHello", "sentence":"sim tudo bem"})
 training_data.append({"class":None, "context":"None", "sentence":"sim"})
 training_data.append({"class":None, "context":"None", "sentence":"nao"})
-
-
 training_data.append({"class":"cumprimentos_3","context":"RHello", "sentence":"nao"})
 training_data.append({"class":"cumprimentos_3","context":"RHello", "sentence":"não"})
 training_data.append({"class":"cumprimentos_3","context":"RHello", "sentence":"nao esta muito bem"})
@@ -60,9 +58,7 @@ training_data.append({"class":"respostas_1","context":"continuar",  "sentence":"
 training_data.append({"class":"respostas_1","context":"continuar",  "sentence":"não"})
 training_data.append({"class":"respostas_1","context":"continuar",  "sentence":"mais nada"})
 
-
-#sugestoes="Sugestoes:(menu)Candidaturas(menu)Cursos(menu)Licenciatura(menu)Mestrado(menu)Doutoramento(menu)Enviar Email"
-
+#Respostas multiplas de cada classe
 Multiple_Responses = {
     "cumprimentos_1":[{"respostas":["Esta tudo bem por aqui e por ai?","Sim esta tudo bem e consigo?","Por aqui tudo numa boa e contigo?"],"context":"RHello"}],
     "cumprimentos_2":[{"respostas": ["Ainda bem! Como lhe posso ajudar?","Bom saber :) . Como lhe posso ser util? ","Espero que continue bem disposto! E entao como lhe posso ajudar?"],"context":"None"}],
@@ -75,21 +71,17 @@ Multiple_Responses = {
     }
 
 
-
-
-
-
-
-
+#variavel que guarda as classes
 classes = list(set([a['class'] for a in training_data]))
 
+#Guarda os contextos que podem existir
 for key in Multiple_Responses.keys():
-  #classes.append(key)
+  
   if Multiple_Responses[key][0].get("context") not in context:
     context.append(Multiple_Responses[key][0].get("context"))
 
 
-
+#associa as palavras e o contexto a cada classe     
 for c in classes:
 
     class_words[c] = []
@@ -114,11 +106,7 @@ for data in training_data:
 
 
 
-
-
-
-
-
+#Calculo do score cada classe para determinada 
 def calculate_class_score(sentence,contexto, class_name, show_details=True):
     score = 0
 
@@ -142,6 +130,7 @@ def calculate_class_score(sentence,contexto, class_name, show_details=True):
     return score
 
 
+#classifica determinada frase retornando a classe que tem maior score
 def classify(sentence,con):
     high_class = None
     high_score = 0
@@ -164,14 +153,11 @@ def classify(sentence,con):
 #Bibliotecas
 import random
 import string
-#import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import nltk
-#import numpy as np
 import warnings
 import pandas as pd
-#from nltk.stem.snowball import SnowballStemmer
 from nltk.stem import RSLPStemmer
 
 
@@ -423,8 +409,7 @@ def string_steem(text):
       string_steem.append('')
   return ' '.join(i for i in string_steem)
 
-
-
+#Verifica se existe submenus
 def check_submenu(text):
   global menu_opcoes
   global submenu
@@ -444,13 +429,7 @@ def check_submenu(text):
     submenu=False
 
 
-
-#### FUNCOES ####
-
-#Send mail
-
-
-#Generate the response
+#Devolve a resposta
 def resposta(text,context):
 
   global lastindex
@@ -459,9 +438,8 @@ def resposta(text,context):
   global multiple_message
   global none_answer
   global new_context
-  #inicio da string
+  
   bot_resposta = ''
-
   multiple_message=0
   none_answer=0
 
@@ -483,28 +461,27 @@ def resposta(text,context):
   #guarda index na variavel global
   lastindex=str(idx)
 
-  #Reduce the dimensionality of vals
+  #Reduz a dimensionalidade dos valores
   flat = vals.flatten()
 
-  #sort the list in ascending order
+  #ordena por ordem crescente
   flat.sort()
 
   #vai buscar o 2º melhor score ja que o 1º e o propria keyword
   score = flat[-2]
 
-  #teste
+  
 
-  #se score=0 entao nao encontrou nenhum texto similar
-  print("a entrar")
+  #se score=0 entao nao encontrou nenhum texto similar e tenta o algoritmo de Naive Bayes
   if score == 0:
     try:
 
       bot_resposta= bot_resposta + random.choice(Multiple_Responses[classify(aux,context)[0]][0].get('respostas'))
       new_context=Multiple_Responses[classify(aux,context)[0]][0].get("context")
       multiple_message=1
-      print("texto",aux)
-      print("set contexto",new_context)
-      print("classificacao",classify(aux,context))
+      
+      
+    
 
       if classify(aux,context)[0]==None:
           none_answer=1
@@ -535,7 +512,7 @@ for i in range(len(keywords)):
 
 
 
-#### MAIN #############
+#Funcao que retorna uma mensagem posterior a mensagem principal
 def post_response(user_input,context):
 
     global submenu
@@ -566,7 +543,7 @@ def post_response(user_input,context):
 
 
 
-
+#Funçao que retorna uma mensagem antes da mensagem principal
 def pre_response(user_input,context):
 
     global keywords
@@ -597,7 +574,7 @@ def pre_response(user_input,context):
     return 0
 
 
-
+#Devolve o contexto da frase
 def get_context(user_input,context):
     global multiple_message
     global keywords
@@ -606,13 +583,15 @@ def get_context(user_input,context):
     if new_context!='continuar':
         keywords = []
         keywords = keywordbackup.copy()
-        #user_response = string_steem(user_input)
+        
         resposta(user_input,context)
     return new_context
 
+
+#Funcao principal do bot que recebe a pergunta do user e devolve a resposta 
 def bot_app(user_input,context):
 
-    #print("Bot da Ual: Ola. Em que posso ajudar?")
+    
 
 
     global keywords
@@ -627,9 +606,9 @@ def bot_app(user_input,context):
     user_response = string_steem(user_response)
 
 
-    #if lastindex == '36':
-     #   lastindex=''
-    #    return 36
+    
+    
+    
     if user_response!='bye':
 
 
@@ -644,5 +623,5 @@ def bot_app(user_input,context):
         else:
           return "(bot)"+ resposta(user_response,context)
     else:
-        #bot_activo=False
+        
         return "(bot)Chat with you later !"
