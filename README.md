@@ -3,14 +3,18 @@
 
 ## **INTRODUÇÃO**
 
-Projecto final de curso que consiste em desenvolver um chatbot para a Universidade Autónoma de Lisboa de forma a funcionar num website e no Messenger do Facebook para esclarecer dúvidas acerca de candidaturas , cursos , e outras informações que os candidatos possam perguntar. 
+Projecto final de curso que consiste em desenvolver um chatbot para a Universidade Autónoma de Lisboa de forma a funcionar num website e no Messenger do Facebook para esclarecer dúvidas acerca de candidaturas, cursos, e outras informações que os candidatos possam perguntar. 
 
 
 ## **FICHEIROS**
 
-Botual/teste_nltk.py - Ficheiro que contem o código principal do bot que contem as funções que recebem as perguntas dos utilizadores, devolvendo as respectivas respostas
+Botual/mysite/teste_nltk.py - Ficheiro que contem o código principal do bot que contem as funções que recebem as perguntas dos utilizadores, devolvendo as respectivas respostas
 
-Botual/flask_app.py - Ficheiro que permite reencaminhar as respostas para o respectivo utilizador destinatário quer facebook ou no website
+Botual/mysite/flask_app.py - Ficheiro que permite reencaminhar as respostas para o respectivo utilizador destinatário quer facebook ou no website
+
+Botual/mysite/templates/new.html - Ficheiro com o respectivo código html para o website
+
+Botual/mysite/assets/images/ - Directoria que irá conter as imagens relativas ao website
         
 
 ## **COMO USAR**
@@ -66,9 +70,9 @@ string
 
 [flask_app.py]
 
-flask - Flask , session , render_template, request
+flask - Flask, session, render_template, request
 
-flask_mail - Mail , Message
+flask_mail - Mail, Message
 
 pymessenger.bot - Bot
 
@@ -89,6 +93,6 @@ André Martins -
 
 Nuno Paradinha - 
 
-Rodrigo Araújo - https://github.com/RodrigoUAL/BotUAL
+Rodrigo Araújo - https://github.com/RodrigoUAL
 
 Ricardo Clemente- https://github.com/ric-clemente
