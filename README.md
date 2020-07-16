@@ -91,7 +91,7 @@ subprocess
 
 André Martins - https://github.com/andrem-martins
 
-Nuno Paradinha - 
+Nuno Paradinha - https://github.com/nunoparadinha
 
 Rodrigo Araújo - https://github.com/RodrigoUAL
 
