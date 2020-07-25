@@ -3,7 +3,7 @@
 
 ## **INTRODUÇÃO**
 
-Projecto final de curso que consiste em desenvolver um chatbot para a Universidade Autónoma de Lisboa de forma a funcionar num website e no Messenger do Facebook para esclarecer dúvidas acerca de candidaturas, cursos, e outras informações que os candidatos possam perguntar. 
+Projecto final de curso do ano lectivo 2019/2020 que consiste em desenvolver um chatbot para a Universidade Autónoma de Lisboa de forma a funcionar num website e no Messenger do Facebook para esclarecer dúvidas acerca de candidaturas, cursos, e outras informações que os candidatos possam perguntar. 
 
 
 ## **FICHEIROS**
